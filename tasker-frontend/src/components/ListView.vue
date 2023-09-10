@@ -2,20 +2,20 @@
   <div class="bg-gray-50">
     <div class="flex items-center justify-center h-screen">
       <div class="w-3/4 md:w-2/4">
-        <form action="" class="w-full">
-          <div class="flex items-center rounded-lg overflow-hidden shadow-sm bg-white">
+        <form @submit.prevent="submitForm" class="w-full">
+          <div class="flex items-center rounded-lg overflow-hidden shadow-md bg-white shadow-gray-200">
             <div class="flex-1">
-              <input type="text" class="w-full bg-transparent p-3 outline-none px-4 text-gray-700 text-sm" placeholder="Enter a Task">
+              <input type="text" class="w-full bg-transparent p-3 outline-none px-4 text-gray-700 text-sm" placeholder="Enter a Task" v-model="task">
             </div>
             <div>
-              <button class="p-3 px-7 bg-green-400 hover:bg-green-500 transition-all rounded-lg text-white font-semibold text-sm shadow-xl">
+              <button class="p-3 px-7 bg-green-400 hover:bg-green-500 transition-all rounded-md text-white font-semibold text-sm shadow-xl" type="submit">
                 Add
               </button>
             </div>
           </div>
         </form>
 
-        <div class="mt-6 shadow-lg rounded-md py-3 max-h-80 overflow-y-auto bg-white">
+        <div class="mt-6 shadow-md shadow-gray-200 rounded-md py-3 max-h-80 overflow-y-auto bg-white">
           <ul>
             <li class="flex items-center justify-between gap-4 text-sm text-gray-700 mb-2 hover:bg-gray-50 p-3">
               <div class="text-start font-semibold">1.</div>
@@ -52,5 +52,18 @@
 </template>
 
 <script setup>
+
+import { ref } from 'vue';
+
+const task = ref('');
+
+const submitForm = () => {
+  if (task.value.trim() === '') {
+    alert("Please enter a task");
+    return;
+  }
+
+
+}
 
 </script>
