@@ -15,11 +15,13 @@
           </div>
         </form>
 
-        <div class="mt-6 shadow-md shadow-gray-200 rounded-md py-3 max-h-80 overflow-y-auto bg-white">
-          <ul>
-            <li class="flex items-center justify-between gap-4 text-sm text-gray-700 mb-2 hover:bg-gray-50 p-3">
-              <div class="text-start font-semibold">1.</div>
-              <div class="text-left flex-1">Lorem ipsum dolor sit amet consectetur adipisicing elit.</div>
+        <div class="mt-6 shadow-md shadow-gray-200 rounded-md max-h-80 overflow-y-auto bg-white" v-if="list.length > 0">
+          <ul v-for="(item, index) in list" v-bind:key="index">
+            <li class="flex items-center justify-between gap-4 text-sm text-gray-700 hover:bg-gray-50 p-3" :class="{ 'border-b border-gray-100': index !== list.length - 1 }">
+              <div class="text-start font-semibold">{{ index + 1 }}</div>
+              <div class="text-left flex-1">
+                {{ item.task }}
+              </div>
               <div class="text-left flex items-center gap-2">
                 <button class="bg-blue-200 text-blue-600 p-1 rounded hover:bg-blue-500 hover:text-white transition-all">
                   <span>
@@ -41,7 +43,6 @@
                 </button>
               </div>
             </li>
-
           </ul>
         </div>
 
@@ -53,9 +54,21 @@
 
 <script setup>
 
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const task = ref('');
+const list = ref([]);
+
+onMounted(() => {
+  fetch('http://localhost:3000/api/', {
+    method: 'GET'
+  })
+    .then(res => res.json())
+    .then(data => {
+      list.value = data;
+      console.log(data);
+    })
+});
 
 const submitForm = () => {
   if (task.value.trim() === '') {
@@ -64,13 +77,19 @@ const submitForm = () => {
   }
 
   fetch('http://localhost:3000/api/save', {
-    method: 'GET',
-  }).then(data => {
-    console.log(data);
-  })
-    .catch(err => console.log(err));
-
-
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      task: task.value
+    })
+  }).then(res => res.json())
+    .then(data => {
+      list.value.push(data);
+      task.value = '';
+      console.log(list.value);
+    })
 }
 
 </script>
