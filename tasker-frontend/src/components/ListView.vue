@@ -63,6 +63,13 @@ const submitForm = () => {
     return;
   }
 
+  fetch('http://localhost:3000/api/save', {
+    method: 'GET',
+  }).then(data => {
+    console.log(data);
+  })
+    .catch(err => console.log(err));
+
 
 }
 
