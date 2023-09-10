@@ -9,7 +9,7 @@
             </div>
             <div>
               <button class="p-3 px-7 bg-green-400 hover:bg-green-500 transition-all rounded-md text-white font-semibold text-sm shadow-xl" type="submit">
-                Add
+                {{ btnText }}
               </button>
             </div>
           </div>
@@ -23,7 +23,7 @@
                 {{ item.task }}
               </div>
               <div class="text-left flex items-center gap-2">
-                <button class="bg-blue-200 text-blue-600 p-1 rounded hover:bg-blue-500 hover:text-white transition-all">
+                <button class="bg-blue-200 text-blue-600 p-1 rounded hover:bg-blue-500 hover:text-white transition-all" @click="EditItem(item.id)">
                   <span>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                       <path stroke-linecap="round" stroke-linejoin="round"
@@ -33,7 +33,7 @@
 
                   </span>
                 </button>
-                <button class="p-1 rounded bg-red-200 text-red-600 hover:bg-red-500 hover:text-white transition-all">
+                <button class="p-1 rounded bg-red-200 text-red-600 hover:bg-red-500 hover:text-white transition-all" @click="DeleteItem(item.id)">
                   <span>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -57,7 +57,9 @@
 import { ref, onMounted } from 'vue';
 
 const task = ref('');
+const btnText = ref('Add');
 const list = ref([]);
+const updateItemId = ref('');
 
 onMounted(() => {
   fetch('http://localhost:3000/api/', {
@@ -66,7 +68,6 @@ onMounted(() => {
     .then(res => res.json())
     .then(data => {
       list.value = data;
-      console.log(data);
     })
 });
 
@@ -76,6 +77,44 @@ const submitForm = () => {
     return;
   }
 
+  if (btnText.value == 'Update') {
+    UpdateItem();
+  } else {
+    SaveItem();
+  }
+}
+
+const DeleteItem = (id) => {
+  fetch(`http://localhost:3000/api/delete/${id}`, {
+    method: 'DELETE'
+  }).then(res => res.json())
+    .then(data => {
+      list.value = data;
+    })
+}
+
+const EditItem = (id) => {
+  btnText.value = 'Update';
+  task.value = list.value.find(item => item.id == id).task;
+  updateItemId.value = id;
+}
+
+const UpdateItem = () => {
+  fetch(`http://localhost:3000/api/update/${updateItemId.value}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      task: task.value
+    })
+  }).then(res => res.json())
+    .then(data => {
+      list.value = data;
+    })
+}
+
+const SaveItem = () => {
   fetch('http://localhost:3000/api/save', {
     method: 'POST',
     headers: {
@@ -86,9 +125,8 @@ const submitForm = () => {
     })
   }).then(res => res.json())
     .then(data => {
-      list.value.push(data);
+      list.value = data;
       task.value = '';
-      console.log(list.value);
     })
 }
 
